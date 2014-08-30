@@ -48,55 +48,46 @@ public class ArgumentSourceParams extends AbstractRequestParams {
 
 	@Override
 	public String[] getParamValues(String paramName) {
-		String[] ret = null;
+		List<String> ret = new ArrayList<String>();
 		int valuesCnt = as.sizeOf(paramName);
 		if (valuesCnt > 0) {
-			String[] values = new String[valuesCnt];
 			for (int i = 0; i < valuesCnt; i++) {
 				String v = as.tryGet(String.class, paramName, null, i, null);
-				values[i] = v;
+				if (v != null) {
+					ret.add(v);
+				}
 			}
-			ret = values;
 		} else {
 			List<String> values = as.tryGetAll(String.class, paramName, null, null, null);
 			if (values != null) {
-				ret = values.toArray(new String[0]);
-			} else {
-				ret = new String[0];
+				ret.addAll(values);
 			}
 		}
-		return ret;
+		return ret.toArray(new String[0]);
 	}
 
 	@Override
 	public UploadedFile[] getUploadedFiles(String paramName) {
-		UploadedFile[] files = null;
+		List<UploadedFile> files = new ArrayList<UploadedFile>();
 		int valuesCnt = as.sizeOf(paramName);
 		if (valuesCnt > 0) {
-			files = new UploadedFile[valuesCnt];
 			for (int i = 0; i < valuesCnt; i++) {
-				UploadedFile f = null;
 				FileData fd = as.tryGet(FileData.class, paramName, null, i, null);
 				if (fd != null) {
-					f = new TfsUploadedFile(fd);
+					files.add(new TfsUploadedFile(fd));
 				}
-				files[i] = f;
 			}
 		} else {
 			List<FileData> values = as.tryGetAll(FileData.class, paramName, null, null, null);
 			if (values != null) {
-				List<UploadedFile> uplFiles = new ArrayList<UploadedFile>();
 				for (FileData fd : values) {
 					if (fd != null) {
-						uplFiles.add(new TfsUploadedFile(fd));
+						files.add(new TfsUploadedFile(fd));
 					}
 				}
-				files = uplFiles.toArray(new UploadedFile[0]);
-			} else {
-				files = new UploadedFile[0];
 			}
 		}
-		return files;
+		return files.toArray(new UploadedFile[0]);
 	}
 
 	@Override
